@@ -1,21 +1,24 @@
 # traefik
 
 ### Step 1: Enabling RBAC
-
+```
 kubectl create -f traefik-rbac.yaml
+```
 
 ### Step 2: Deploy Traefik to a Cluster
-
+```
 kubectl create -f trefik-daemonset.yaml
+```
 
 ### Step 3: Create NodePorts for External Access
-
+```
 kubectl create -f traefik-svc.yaml
-
+```
+```
 kubectl get pods --all -n kube-system | grep traefik
-
+```
 #### To verify the service was created
-
+```
 kubectl describe svc traefik-ingress-service --namespace=kube-system
 
 Name:                     traefik-ingress-service
@@ -53,7 +56,7 @@ Session Affinity:         None
 External Traffic Policy:  Cluster
 
 Events:                   <none>
-  
+```  
 #### As you see, now we have two NodePorts (“web” and “admin”) that route to the 80 and 8080 container ports of the Traefik Ingress controller. The “admin” NodePort will be used to access the Traefik Web UI and the “web” NodePort will be used to access services exposed via Ingress.
 
 ### Step 4: Accessing Traefik
@@ -67,12 +70,12 @@ Events:                   <none>
 #### Now we have Traefik as the Ingress Controller in the Kubernetes cluster. However, we still need to define the Ingress resource and a Service that exposes Traefik Web UI.
 
 #### Let’s first create a Service:
-
+```
 kubectl create -f traefik-webui-svc.yaml
-
+```
 #### Let’s verify that the Service was created:
 
-
+```
 kubectl describe svc traefik-web-ui --namespace=kube-system
 
 Name:              traefik-web-ui
@@ -98,31 +101,31 @@ Endpoints:         172.17.0.6:8080
 Session Affinity:  None
 
 Events:            <none>
-
+```
 #### Next, we need to create an Ingress resource pointing to the Traefik Web UI backend.
-
+```
 kubectl create -f traefik-ingress.yaml  
-
+```
 #### You should now be able to see Traefik dashboard http://localhost:<admin_NodePort>
   
 ### Step 6: Implementing Name-Based Routing  
 
 #### Each Deployment will have two Pod replicas, and each Pod will serve the “animal” websites on the containerPort 80.
-
+```
 kubectl create -f animals-deployment.yaml
-
+```
 #### Now, let’s create a Service for each Deployment to make the Pods accessible:
-
+```
 kubectl create -f animals-svc.yaml
-
+```
 #### Finally, let’s create an Ingress with three frontend-backend pairs for each Deployment. bear.animal.com , moose.animal.com , and hare.animal.come will be our frontends pointing to corresponding backend Services.
-
+```
 kubectl create -f animals-ingress.yaml
-
+```
 #### Now, inside the Traefik dashboard and you should see a frontend for each host along with a list of corresponding backends.
 
 #### If you edit your /etc/hosts again you should be able to access the animal websites in your browser.
-
+```
 vi /etc/hosts
 
 10.32.0.3       bear.animal.com
@@ -150,17 +153,15 @@ body {background-image: url("img/bear.jpg");}
 
 </body>
 </html>
-
+```
 #### Access Traefik dashboard on browser at http://localhost:<admin_NodePort> 
 
 #### You should use the “web” NodePort to access specific sites. For example,
-
+```
 http://bare.animal.com<web_NodePort>
-
 http://hare.animal.com<web_NodePort>
-
 http://moose.animal.com<web_NodePort>
-
+```
 #### We can also reconfigure three frontends to serve under one domain like this:
 ```
 apiVersion: extensions/v1beta1
@@ -188,10 +189,16 @@ spec:
           serviceName: hare
           servicePort: http
 ```          
-If you activate this Ingress, all three animals will be accessible under one domain — animals.minikube — using corresponding paths. Don’t forget to add this domain to /etc/hosts .
-echo “$(minikube ip) animals.minikube” | sudo tee -a /etc/hosts
-Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: http://animals.minikube:32484/moose/ instead of http://animals.minikube:32484/moose (add forward slash to the path).
+#### If you activate this Ingress, all three animals will be accessible under one domain — animals.minikube — using corresponding paths. Don’t forget to add this domain to /etc/hosts .
+```
+vi /etc/hosts
 
+127.0.0.1 animals.minikube
+```
+### Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: 
+```
+http://animals.minikube:<web_NodePort>moose/ 
+```
 #### Conclusion
 
 #### Ingress is a powerful tool for routing external traffic to corresponding backend services in your Kubernetes cluster. Users can implement Ingress using a number of Ingress controllers supported by Kubernetes. Here we used Traefik Ingress controller that supports name-based routing, load balancing, and other common tasks of Ingress controllers. 
