@@ -153,13 +153,44 @@ body {background-image: url("img/bear.jpg");}
 
 #### Access Traefik dashboard on browser at http://localhost:<admin_NodePort> 
 
-#### To access created animal services 
+#### You should use the “web” NodePort to access specific sites. For example,
 
 http://bare.animal.com<web_NodePort>
 
 http://hare.animal.com<web_NodePort>
 
 http://moose.animal.com<web_NodePort>
+
+#### We can also reconfigure three frontends to serve under one domain like this:
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: all-animals
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
+spec:
+  rules:
+  - host: animals.minikube
+    http:
+      paths:
+      - path: /bear
+        backend:
+          serviceName: bear
+          servicePort: http
+      - path: /moose
+        backend:
+          serviceName: moose
+          servicePort: http
+      - path: /hare
+        backend:
+          serviceName: hare
+          servicePort: http
+```          
+If you activate this Ingress, all three animals will be accessible under one domain — animals.minikube — using corresponding paths. Don’t forget to add this domain to /etc/hosts .
+echo “$(minikube ip) animals.minikube” | sudo tee -a /etc/hosts
+Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: http://animals.minikube:32484/moose/ instead of http://animals.minikube:32484/moose (add forward slash to the path).
 
 #### Conclusion
 
