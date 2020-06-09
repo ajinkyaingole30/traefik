@@ -173,7 +173,7 @@ metadata:
     traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: animals.minikube
+  - host: animals.com
     http:
       paths:
       - path: /bear
