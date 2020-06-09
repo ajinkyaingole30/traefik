@@ -121,9 +121,13 @@ kubectl create -f animals-ingress.yaml
 
 ##### Now, inside the Traefik dashboard and you should see a frontend for each host along with a list of corresponding backends.
 
+##### If you edit your /etc/hosts again you should be able to access the animal websites in your browser.
+
 vi /etc/hosts
 
 10.32.0.3 bear.animal.com hare.animal.com moose.animal.com
+
+
 
 curl bear.example.com
 
@@ -145,8 +149,8 @@ body {background-image: url("img/bear.jpg");}
 
 ##### To access created animal services 
 
-http://bare.animal.com:<web_NodePort> 
+http://bare.animal.com
 
-http://hare.animal.com:<web_NodePort>
+http://hare.animal.com
 
-http://moose.animal.com:<web_NodePort>
+http://moose.animal.com
