@@ -4,7 +4,7 @@ kubectl create -f traefik-rbac.yaml
 
 kubectl create -f trefik-daemonset.yaml
 
-## Create NodePorts for External Access
+### Create NodePorts for External Access
 
 kubectl create -f traefik-svc.yaml
 
