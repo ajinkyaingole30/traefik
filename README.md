@@ -154,3 +154,9 @@ http://bare.animal.com
 http://hare.animal.com
 
 http://moose.animal.com
+
+#### Conclusion
+
+##### Ingress is a powerful tool for routing external traffic to corresponding backend services in your Kubernetes cluster. Users can implement Ingress using a number of Ingress controllers supported by Kubernetes. Here we used Traefik Ingress controller that supports name-based routing, load balancing, and other common tasks of Ingress controllers. 
+
+
