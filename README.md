@@ -124,7 +124,7 @@ Finally, let’s create an Ingress with three frontend-backend pairs for each De
 ```
 Now, inside the Traefik dashboard and you should see a frontend for each host along with a list of corresponding backends.
 
-If you edit your /etc/hosts again you should be able to access the animal websites in your browser.
+If you edit your /etc/hosts you should be able to access the animal websites in your browser.
 ```
 # vi /etc/hosts
 
@@ -156,7 +156,7 @@ body {background-image: url("img/bear.jpg");}
 ```
 Access Traefik dashboard on browser at http://localhost:<admin_NodePort> 
 
-You should use the “web” NodePort to access specific sites. For example,
+To access specific website on browser you should use the “web” NodePort. For example,
 ```
 http://bare.animal.com<web_NodePort>
 http://hare.animal.com<web_NodePort>
