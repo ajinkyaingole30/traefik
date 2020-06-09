@@ -193,11 +193,11 @@ spec:
 ```
 vi /etc/hosts
 
-127.0.0.1 animals.minikube
+127.0.0.1 animals.com
 ```
-#### Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: 
+#### To access service
 ```
-http://animals.minikube:<web_NodePort>moose/ 
+http://animals.com:<web_NodePort>moose/ 
 ```
 ### Conclusion
 
