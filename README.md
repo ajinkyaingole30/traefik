@@ -125,7 +125,13 @@ kubectl create -f animals-ingress.yaml
 
 vi /etc/hosts
 
-10.32.0.3 bear.animal.com hare.animal.com moose.animal.com
+10.32.0.3       bear.animal.com
+10.32.0.4       bear.animal.com
+10.40.0.6       hare.animal.com
+10.32.0.5       hare.animal.com
+10.40.0.5       moose.animal.com
+10.40.0.4       moose.animal.com
+
 
 
 
