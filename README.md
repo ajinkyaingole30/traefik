@@ -197,7 +197,7 @@ If you activate this Ingress, all three animals will be accessible under one dom
 ```
 #### To access service
 ```
-http://animals.com:<web_NodePort>moose/ 
+http://animals.com:<web_NodePort>/moose/ 
 ```
 ### Conclusion
 
