@@ -1,1 +1,3 @@
 # traefik
+
+kubectl create -f 
