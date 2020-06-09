@@ -2,24 +2,24 @@
 
 ### Step 1: Enabling RBAC
 ```
-kubectl create -f traefik-rbac.yaml
+# kubectl create -f traefik-rbac.yaml
 ```
 
 ### Step 2: Deploy Traefik to a Cluster
 ```
-kubectl create -f trefik-daemonset.yaml
+# kubectl create -f trefik-daemonset.yaml
 ```
 
 ### Step 3: Create NodePorts for External Access
 ```
-kubectl create -f traefik-svc.yaml
+# kubectl create -f traefik-svc.yaml
 ```
 ```
-kubectl get pods --all -n kube-system | grep traefik
+# kubectl get pods --all -n kube-system | grep traefik
 ```
 #### To verify the service was created
 ```
-kubectl describe svc traefik-ingress-service --namespace=kube-system
+# kubectl describe svc traefik-ingress-service --namespace=kube-system
 
 Name:                     traefik-ingress-service
 
@@ -71,12 +71,12 @@ Events:                   <none>
 
 #### Let’s first create a Service:
 ```
-kubectl create -f traefik-webui-svc.yaml
+# kubectl create -f traefik-webui-svc.yaml
 ```
 #### Let’s verify that the Service was created:
 
 ```
-kubectl describe svc traefik-web-ui --namespace=kube-system
+# kubectl describe svc traefik-web-ui --namespace=kube-system
 
 Name:              traefik-web-ui
 
@@ -104,7 +104,7 @@ Events:            <none>
 ```
 #### Next, we need to create an Ingress resource pointing to the Traefik Web UI backend.
 ```
-kubectl create -f traefik-ingress.yaml  
+# kubectl create -f traefik-ingress.yaml  
 ```
 #### You should now be able to see Traefik dashboard http://localhost:<admin_NodePort>
   
@@ -112,21 +112,21 @@ kubectl create -f traefik-ingress.yaml
 
 #### Each Deployment will have two Pod replicas, and each Pod will serve the “animal” websites on the containerPort 80.
 ```
-kubectl create -f animals-deployment.yaml
+# kubectl create -f animals-deployment.yaml
 ```
 #### Now, let’s create a Service for each Deployment to make the Pods accessible:
 ```
-kubectl create -f animals-svc.yaml
+# kubectl create -f animals-svc.yaml
 ```
 #### Finally, let’s create an Ingress with three frontend-backend pairs for each Deployment. bear.animal.com , moose.animal.com , and hare.animal.come will be our frontends pointing to corresponding backend Services.
 ```
-kubectl create -f animals-ingress.yaml
+# kubectl create -f animals-ingress.yaml
 ```
 #### Now, inside the Traefik dashboard and you should see a frontend for each host along with a list of corresponding backends.
 
 #### If you edit your /etc/hosts again you should be able to access the animal websites in your browser.
 ```
-vi /etc/hosts
+# vi /etc/hosts
 
 10.32.0.3       bear.animal.com
 10.32.0.4       bear.animal.com
@@ -138,7 +138,7 @@ vi /etc/hosts
 
 
 
-curl bear.example.com
+# curl bear.example.com
 
 <!DOCTYPE html>
 <html>
@@ -191,7 +191,7 @@ spec:
 ```          
 #### If you activate this Ingress, all three animals will be accessible under one domain — animals.minikube — using corresponding paths. Don’t forget to add this domain to /etc/hosts .
 ```
-vi /etc/hosts
+# vi /etc/hosts
 
 127.0.0.1 animals.com
 ```
