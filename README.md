@@ -195,11 +195,11 @@ vi /etc/hosts
 
 127.0.0.1 animals.minikube
 ```
-### Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: 
+#### Note: We are configuring Traefik to strip the prefix from the URL path with the traefik.frontend.rule.type annotation. This way we can use the containers from the previous example without modification. Because of the traefik.frontend.rule.type: PathPrefixStrip rule you have to use: 
 ```
 http://animals.minikube:<web_NodePort>moose/ 
 ```
-#### Conclusion
+### Conclusion
 
 #### Ingress is a powerful tool for routing external traffic to corresponding backend services in your Kubernetes cluster. Users can implement Ingress using a number of Ingress controllers supported by Kubernetes. Here we used Traefik Ingress controller that supports name-based routing, load balancing, and other common tasks of Ingress controllers. 
 
