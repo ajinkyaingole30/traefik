@@ -6,9 +6,9 @@ This guide explains how to use Traefik as an Ingress controller for a Kubernetes
 
 ### Prerequisites
 
-A working Kubernetes cluster
+A working Kubernetes cluster.
 
-To download below yaml files you can clone the git url: 
+_To download below yaml files you can clone the git url: 
 ```
 git clone https://github.com/ajinkyaingole30/traefik.git
 ```
