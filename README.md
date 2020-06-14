@@ -60,8 +60,8 @@ subjects:
 - kind: ServiceAccount
   name: traefik-ingress-controller
   namespace: kube-system
-
-
+  
+  
 # kubectl create -f traefik-rbac.yaml
 ```
 
@@ -130,12 +130,30 @@ spec:
 
 ### Step 3: Create NodePorts for External Access
 ```
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-ingress-service
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+    - protocol: TCP
+      port: 80
+      name: web
+    - protocol: TCP
+      port: 8080
+      name: admin
+  type: NodePort
+  
 # kubectl create -f traefik-svc.yaml
 ```
+To check status of pods
 ```
 # kubectl get pods --all -n kube-system | grep traefik
 ```
-To verify the service was created
+Now, let’s verify that the Service was created:
 ```
 # kubectl describe svc traefik-ingress-service --namespace=kube-system
 
