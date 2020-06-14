@@ -207,6 +207,20 @@ Now we have Traefik as the Ingress Controller in the Kubernetes cluster. However
 
 Let’s first create a Service:
 ```
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8080
+    
+    
 # kubectl create -f traefik-webui-svc.yaml
 ```
 Let’s verify that the Service was created:
@@ -240,22 +254,194 @@ Events:            <none>
 ```
 Next, we need to create an Ingress resource pointing to the Traefik Web UI backend.
 ```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  rules:
+  - host: traefik-ui.minikube
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik-web-ui
+          servicePort: web
+          
+          
 # kubectl create -f traefik-ingress.yaml  
 ```
 You should now be able to see Traefik dashboard http://localhost:<admin_NodePort>
   
-### Step 6: Implementing Name-Based Routing  
+### Step 6: Implementing Name-Based Routing
+Now, let’s demonstrate how Traefik Ingress Controller can be used to set up name-based routing for a list of frontends. We will create three Deployments with simple single-page websites displaying images of animals: bear, hare, and moose.
 
 Each Deployment will have two Pod replicas, and each Pod will serve the “animal” websites on the containerPort 80.
 ```
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bear
+  labels:
+    app: animals
+    animal: bear
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: animals
+      task: bear
+  template:
+    metadata:
+      labels:
+        app: animals
+        task: bear
+        version: v0.0.1
+    spec:
+      containers:
+      - name: bear
+        image: supergiantkir/animals:bear
+        ports:
+        - containerPort: 80
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: moose
+  labels:
+    app: animals
+    animal: moose
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: animals
+      task: moose
+  template:
+    metadata:
+      labels:
+        app: animals
+        task: moose
+        version: v0.0.1
+    spec:
+      containers:
+      - name: moose
+        image: supergiantkir/animals:moose
+        ports:
+        - containerPort: 80
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hare
+  labels:
+    app: animals
+    animal: hare
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: animals
+      task: hare
+  template:
+    metadata:
+      labels:
+        app: animals
+        task: hare
+        version: v0.0.1
+    spec:
+      containers:
+      - name: hare
+        image: supergiantkir/animals:hare
+        ports:
+        - containerPort: 80
+        
+        
 # kubectl create -f animals-deployment.yaml
 ```
 Now, let’s create a Service for each Deployment to make the Pods accessible:
 ```
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bear
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: animals
+    task: bear
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: moose
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: animals
+    task: moose
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hare
+  annotations:
+    traefik.backend.circuitbreaker: "NetworkErrorRatio() > 0.5"
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: animals
+    task: hare
+    
+    
 # kubectl create -f animals-svc.yaml
 ```
 Finally, let’s create an Ingress with three frontend-backend pairs for each Deployment. bear.animal.com , moose.animal.com , and hare.animal.come will be our frontends pointing to corresponding backend Services.
 ```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: animals
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: hare.animal.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: hare
+          servicePort: http
+  - host: bear.animal.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: bear
+          servicePort: http
+  - host: moose.animal.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: moose
+          servicePort: http
+          
+          
 # kubectl create -f animals-ingress.yaml
 ```
 Now, inside the Traefik dashboard and you should see a frontend for each host along with a list of corresponding backends.
