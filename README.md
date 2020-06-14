@@ -10,7 +10,7 @@ A working Kubernetes cluster.
 
 _To download below yaml files you can clone the git url:_ 
 ```
-git clone https://github.com/ajinkyaingole30/traefik.git
+# git clone https://github.com/ajinkyaingole30/traefik.git
 ```
 
 ### Step 1: Role Based Access Control configuration
