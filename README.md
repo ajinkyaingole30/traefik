@@ -1,12 +1,130 @@
-# traefik
+# Deploying Traefik as Ingress Controller for Your Kubernetes Cluster
 
-### Step 1: Enabling RBAC
+Traefik is an open-source Edge Router that makes publishing your services a fun and easy experience. It receives requests on behalf of your system and finds out which components are responsible for handling them.
+
+### Kubernetes Ingress Controller
+This guide explains how to use Traefik as an Ingress controller for a Kubernetes cluster.
+
+Prerequisites
+A working Kubernetes cluster
+
+### Step 1: Role Based Access Control configuration
+Kubernetes introduces Role Based Access Control (RBAC) in 1.6+ to allow fine-grained control of Kubernetes resources and API.
+
+If your cluster is configured with RBAC, you will need to authorize Traefik to use the Kubernetes API. There are two ways to set up the proper permission: Via namespace-specific RoleBindings or a single, global ClusterRoleBinding.
+
+RoleBindings per namespace enable to restrict granted permissions to the very namespaces only that Traefik is watching over, thereby following the least-privileges principle. This is the preferred approach if Traefik is not supposed to watch all namespaces, and the set of namespaces does not change dynamically. Otherwise, a single ClusterRoleBinding must be employed.
+
+For the sake of simplicity, this guide will use a ClusterRoleBinding:
 ```
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress-controller
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+    - extensions
+    resources:
+    - ingresses/status
+    verbs:
+    - update
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-ingress-controller
+subjects:
+- kind: ServiceAccount
+  name: traefik-ingress-controller
+  namespace: kube-system
+
+
 # kubectl create -f traefik-rbac.yaml
 ```
 
-### Step 2: Deploy Traefik to a Cluster
+### Step 2: Deploy Traefik using a Deployment or DaemonSet¶
+It is possible to use Traefik with a Deployment or a DaemonSet object, whereas both options have their own pros and cons:
+
+The scalability can be much better when using a Deployment, because you will have a Single-Pod-per-Node model when using a DaemonSet, whereas you may need less replicas based on your environment when using a Deployment.
+DaemonSets automatically scale to new nodes, when the nodes join the cluster, whereas Deployment pods are only scheduled on new nodes if required.
+DaemonSets ensure that only one replica of pods run on any single node. Deployments require affinity settings if you want to ensure that two pods don't end up on the same node.
+DaemonSets can be run with the NET_BIND_SERVICE capability, which will allow it to bind to port 80/443/etc on each host. This will allow bypassing the kube-proxy, and reduce traffic hops. Note that this is against the Kubernetes Best Practices Guidelines, and raises the potential for scheduling/scaling issues. Despite potential issues, this remains the choice for most ingress controllers.
+If you are unsure which to choose, start with the Daemonset.
+
+here we used daemonset
 ```
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+      name: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: traefik:v1.7
+        name: traefik-ingress-lb
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8080
+          hostPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+        args:
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+
+
 # kubectl create -f trefik-daemonset.yaml
 ```
 
