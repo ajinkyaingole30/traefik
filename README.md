@@ -6,6 +6,7 @@ Traefik is an open-source Edge Router that makes publishing your services a fun 
 This guide explains how to use Traefik as an Ingress controller for a Kubernetes cluster.
 
 Prerequisites
+
 A working Kubernetes cluster
 
 ### Step 1: Role Based Access Control configuration
