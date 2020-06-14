@@ -8,6 +8,11 @@ This guide explains how to use Traefik as an Ingress controller for a Kubernetes
 
 A working Kubernetes cluster
 
+To download below yaml files you can clone the git url: 
+```
+git clone https://github.com/ajinkyaingole30/traefik.git
+```
+
 ### Step 1: Role Based Access Control configuration
 Kubernetes introduces Role Based Access Control (RBAC) in 1.6+ to allow fine-grained control of Kubernetes resources and API.
 
