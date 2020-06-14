@@ -71,7 +71,7 @@ subjects:
 ```
 
 ### Step 2: Deploy Traefik using a Deployment or DaemonSet
-- It is possible to use Traefik with a Deployment or a DaemonSet object, whereas both options have their own pros and cons:
+It is possible to use Traefik with a Deployment or a DaemonSet object, whereas both options have their own pros and cons:
 
 - The scalability can be much better when using a Deployment, because you will have a Single-Pod-per-Node model when using a DaemonSet, whereas you may need less replicas based on your environment when using a Deployment.
 
