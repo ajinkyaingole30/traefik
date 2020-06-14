@@ -71,15 +71,19 @@ subjects:
 ```
 
 ### Step 2: Deploy Traefik using a Deployment or DaemonSet
-It is possible to use Traefik with a Deployment or a DaemonSet object, whereas both options have their own pros and cons:
+- It is possible to use Traefik with a Deployment or a DaemonSet object, whereas both options have their own pros and cons:
 
-The scalability can be much better when using a Deployment, because you will have a Single-Pod-per-Node model when using a DaemonSet, whereas you may need less replicas based on your environment when using a Deployment.
-DaemonSets automatically scale to new nodes, when the nodes join the cluster, whereas Deployment pods are only scheduled on new nodes if required.
-DaemonSets ensure that only one replica of pods run on any single node. Deployments require affinity settings if you want to ensure that two pods don't end up on the same node.
-DaemonSets can be run with the NET_BIND_SERVICE capability, which will allow it to bind to port 80/443/etc on each host. This will allow bypassing the kube-proxy, and reduce traffic hops. Note that this is against the Kubernetes Best Practices Guidelines, and raises the potential for scheduling/scaling issues. Despite potential issues, this remains the choice for most ingress controllers.
-If you are unsure which to choose, start with the Daemonset.
+- The scalability can be much better when using a Deployment, because you will have a Single-Pod-per-Node model when using a DaemonSet, whereas you may need less replicas based on your environment when using a Deployment.
 
-here we used daemonset
+- DaemonSets automatically scale to new nodes, when the nodes join the cluster, whereas Deployment pods are only scheduled on new nodes if required.
+
+- DaemonSets ensure that only one replica of pods run on any single node. Deployments require affinity settings if you want to ensure that two pods don't end up on the same node.
+
+- DaemonSets can be run with the NET_BIND_SERVICE capability, which will allow it to bind to port 80/443/etc on each host. This will allow bypassing the kube-proxy, and reduce traffic hops. Note that this is against the Kubernetes Best Practices Guidelines, and raises the potential for scheduling/scaling issues. Despite potential issues, this remains the choice for most ingress controllers.
+
+- If you are unsure which to choose, start with the Daemonset.
+
+Here we used daemonset
 ```
 ---
 apiVersion: v1
